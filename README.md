@@ -46,7 +46,7 @@ TBD
 
 `blast` runs a specified number of requests at a given concurrency level, providing comprehensive performance stats. Supports HTTP/2.
 
-```bash
+```text
 Usage: blast [options...] <url>
 
 Options:

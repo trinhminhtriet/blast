@@ -40,7 +40,7 @@
 
 ## 🚀 Installation
 
-TBD
+Download from [latest releases ](https://github.com/trinhminhtriet/blast/releases)
 
 ## 💡 Usage
 

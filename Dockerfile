@@ -1,32 +1,23 @@
-FROM golang:1.23 as build
+FROM golang:1.24-bullseye AS builder
 
-# See https://stackoverflow.com/a/55757473/12429735
-ENV USER=appuser
-ENV UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
-    "${USER}"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    upx-ucl
 
-RUN apt-get update && apt-get install -y ca-certificates
-RUN go get github.com/trinhminhtriet/blast
+WORKDIR /build
+
+COPY . .
 
 # Build
-WORKDIR /go/src/github.com/trinhminhtriet/blast
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/blast blast.go
+RUN go mod download && go mod tidy
+RUN CGO_ENABLED=0 go build \
+    -ldflags='-w -s -extldflags "-static"' \
+    -o ./bin/blast blast.go \
+    && upx-ucl --best --ultra-brute ./bin/blast
 
 ###############################################################################
 # final stage
 FROM scratch
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /etc/passwd /etc/passwd
-COPY --from=build /etc/group /etc/group
-USER appuser:appuser
 
 ARG APPLICATION="blast"
 ARG DESCRIPTION="🚀 Blast: A powerful, lightweight HTTP load generator for stress testing and benchmarking web applications with ease."
@@ -39,5 +30,6 @@ LABEL org.opencontainers.image.ref.name="${PACKAGE}" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.source="https://github.com/${PACKAGE}"
 
-COPY --from=build /go/bin/${APPLICATION} /blast
-ENTRYPOINT ["/blast"]
+COPY --from=builder /build/bin/blast /bin/
+WORKDIR /workdir
+ENTRYPOINT ["/bin/blast"]

@@ -85,6 +85,10 @@ We welcome contributions!
 
 Once your pull request has been merged, you can delete your branch.
 
+## 📢 Acknowledgements
+
+Blast is inspired by and builds upon ideas from open-source HTTP benchmarking tools such as [wrk](https://github.com/wg/wrk), [hey](https://github.com/rakyll/hey), and [vegeta](https://github.com/tsenart/vegeta). Special thanks to the open-source community for their valuable contributions and resources.
+
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
